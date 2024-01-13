@@ -4,8 +4,11 @@
 - org.springframework.cloud.openfeign.FallbackFactory;
 - org.springframework.cloud.openfeign.CircuitBreakerNameResolver
 - org.springframework.cloud.openfeign.FeignClientProperties$FeignClientConfiguration
+- org.springframework.cloud.openfeign.FeignCircuitBreakerInvocationHandler
 - feign.RetryableException
 - feign.FeignException
+- feign.FeignException$InternalServerError
+- feign.FeignException$BadRequest
 
 # Openfeign Configuration
 - /org/springframework/cloud/spring-cloud-openfeign-core/3.1.7/spring-cloud-openfeign-core-3.1.7.jar!/META-INF/additional-spring-configuration-metadata.json
@@ -35,7 +38,8 @@
 - io.github.resilience4j.ratelimiter.RateLimiter
 - io.github.resilience4j.ratelimiter.RateLimiterConfig
 - io.github.resilience4j.ratelimiter.RateLimiterRegistry
-- io.github.resilience4j.ratelimiter.RequestNotPermitted;
+- io.github.resilience4j.ratelimiter.RequestNotPermitted
+- io.github.resilience4j.ratelimiter.configure.RateLimiterAspect*
 
 # Core classes of Resilience4j Retry
 - io.github.resilience4j.retry.annotation.Retry@
@@ -44,7 +48,8 @@
 - io.github.resilience4j.retry.RetryRegistry
 - io.github.resilience4j.retry.autoconfigure.RetryAutoConfiguration
 - io.github.resilience4j.retry.autoconfigure.RetryMetricsAutoConfiguration
-- 
+- io.github.resilience4j.retry.configure.RetryAspect*
+
 # Core classes of Resilience4j TimeLimiter
 - io.github.resilience4j.timelimiter.annotation.TimeLimiter@
 - io.github.resilience4j.timelimiter.TimeLimiter
@@ -55,6 +60,7 @@
 - io.github.resilience4j.ratelimiter.autoconfigure.RateLimitersHealthIndicatorAutoConfiguration
 - io.github.resilience4j.timelimiter.autoconfigure.TimeLimiterAutoConfiguration
 - io.github.resilience4j.timelimiter.autoconfigure.TimeLimiterMetricsAutoConfiguration
+- io.github.resilience4j.timelimiter.configure.TimeLimiterAspect*
 
 - io.github.resilience4j.scheduled.threadpool.autoconfigure.ContextAwareScheduledThreadPoolAutoConfiguration
 
@@ -129,7 +135,21 @@
 - curl http://localhost:8080/e/json?task=408[timeout]
 - curl http://localhost:8080/e/json?task=200[timelimiter]
 - curl http://localhost:8080/d/json?task=408[bulkhead]
-- curl http://localhost:8080/a/json?task=500[circuitbreaker]
 
 
 
+# circuitbreaker
+- `curl http://localhost:8080/feign/[a|b|c|d|e]/json?task=[400|500]` - {call api multiple times}
+- `curl http://localhost:8080/normal/a/json?task=[400|500]` - {call api multiple times}
+
+# retry
+- `curl http://localhost:8080/feign/b/json?task=307`
+- `curl http://localhost:8080/normal/b/json?task=307`
+
+# rate limiter
+- `curl http://localhost:8080/feign/[c|e]/json?task=200`
+- `curl http://localhost:8080/normal/c/json?task=200`
+
+# time limiter
+- `curl http://localhost:8080/feign/e/json?task=408`
+- `curl http://localhost:8080/normal/e/json?task=408`
