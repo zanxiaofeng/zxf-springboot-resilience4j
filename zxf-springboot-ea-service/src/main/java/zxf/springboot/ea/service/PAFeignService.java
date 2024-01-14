@@ -1,6 +1,5 @@
 package zxf.springboot.ea.service;
 
-import io.github.resilience4j.timelimiter.annotation.TimeLimiter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
@@ -62,9 +61,7 @@ public class PAFeignService {
         return json;
     }
 
-    //Time Limiter Name: ServiceE
     @Async
-    @TimeLimiter(name = "ServiceE")
     public CompletableFuture<Map<String, Object>> e(Integer task) {
         log.info("::e START, task={}", task);
         Map<String, Object> json = new HashMap<>();

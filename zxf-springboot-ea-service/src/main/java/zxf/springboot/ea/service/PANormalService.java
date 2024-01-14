@@ -6,12 +6,10 @@ import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
 import io.github.resilience4j.retry.annotation.Retry;
 import io.github.resilience4j.timelimiter.annotation.TimeLimiter;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.scheduling.annotation.Async;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
+import zxf.springboot.ea.client.PANormalClient;
 
-import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -19,8 +17,8 @@ import java.util.concurrent.CompletableFuture;
 @Slf4j
 @Service
 public class PANormalService {
-    @Value("${pa-service.url}")
-    private String baseUrl;
+    @Autowired
+    private PANormalClient paNormalClient;
 
     public PANormalService() {
         log.info("::ctor");
@@ -33,7 +31,7 @@ public class PANormalService {
         Map<String, Object> json = new HashMap<>();
         json.put("task", task);
         json.put("value", "Default Value in A Service of EA");
-        json.put("downstream", callDownstream(baseUrl + "/pa/a/json?task=" + task));
+        json.put("downstream", paNormalClient.callDownstreamSync("/pa/a/json?task=" + task));
         log.info("::a END, task={}", task);
         return json;
     }
@@ -45,7 +43,7 @@ public class PANormalService {
         Map<String, Object> json = new HashMap<>();
         json.put("task", task);
         json.put("value", "Default Value in B Service of EA");
-        json.put("downstream", callDownstream(baseUrl + "/pa/b/json?task=" + task));
+        json.put("downstream", paNormalClient.callDownstreamSync("/pa/b/json?task=" + task));
         log.info("::b END, task={}", task);
         return json;
     }
@@ -57,7 +55,7 @@ public class PANormalService {
         Map<String, Object> json = new HashMap<>();
         json.put("task", task);
         json.put("value", "Default Value in C Service of EA");
-        json.put("downstream", callDownstream(baseUrl + "/pa/c/json?task=" + task));
+        json.put("downstream", paNormalClient.callDownstreamSync("/pa/c/json?task=" + task));
         log.info("::c END, task={}", task);
         return json;
     }
@@ -69,36 +67,35 @@ public class PANormalService {
     @Bulkhead(name = "Normal-ServiceD")
     public CompletableFuture<Map<String, Object>> d(Integer task) {
         log.info("::d START, task={}", task);
-        Map<String, Object> json = new HashMap<>();
-        json.put("task", task);
-        json.put("value", "Default Value in D Service of EA");
-        json.put("downstream", callDownstream(baseUrl + "/pa/d/json?task=" + task));
+
+        CompletableFuture<Map<String, Object>> result = paNormalClient.callDownstreamAsync("/pa/d/json?task=" + task)
+                .thenApply((response) -> {
+                    Map<String, Object> json = new HashMap<>();
+                    json.put("task", task);
+                    json.put("value", "Default Value in D Service of EA");
+                    json.put("downstream", response);
+                    return json;
+                });
+
         log.info("::d END, task={}", task);
-        return CompletableFuture.completedFuture(json);
+        return result;
     }
 
-    //Time Limiter Name: Normal-ServiceE(TimeLimiter must use with Async and CompletableFuture)
-    @Async
+    //Time Limiter Name: Normal-ServiceE(TimeLimiter must use with CompletableFuture and CompletableFuture must be run in another thread)
     @TimeLimiter(name = "Normal-ServiceE")
     public CompletableFuture<Map<String, Object>> e(Integer task) {
         log.info("::e START, task={}", task);
-        Map<String, Object> json = new HashMap<>();
-        json.put("task", task);
-        json.put("value", "Default Value in E Service of EA");
-        json.put("downstream", callDownstream(baseUrl + "/pa/e/json?task=" + task));
-        log.info("::e END, task={}", task);
-        return CompletableFuture.completedFuture(json);
-    }
 
-    private Map<String, Object> callDownstream(String path) {
-        try {
-            log.info("::callDownstream START, path={}", path);
-            Map<String, Object> result = new RestTemplate().getForObject(URI.create(path), Map.class);
-            log.info("::callDownstream END, path={}, result={}", path, result);
-            return result;
-        } catch (Throwable ex) {
-            log.error("Exception when call downstream api.", ex);
-            throw ex;
-        }
+        CompletableFuture<Map<String, Object>> result = paNormalClient.callDownstreamAsync("/pa/e/json?task=" + task)
+                .thenApply((response) -> {
+                    Map<String, Object> json = new HashMap<>();
+                    json.put("task", task);
+                    json.put("value", "Default Value in E Service of EA");
+                    json.put("downstream", response);
+                    return json;
+                });
+
+        log.info("::e END, task={}", task);
+        return result;
     }
 }

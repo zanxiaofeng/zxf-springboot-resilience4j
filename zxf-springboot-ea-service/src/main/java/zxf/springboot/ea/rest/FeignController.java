@@ -1,5 +1,6 @@
 package zxf.springboot.ea.rest;
 
+import io.github.resilience4j.timelimiter.annotation.TimeLimiter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -44,6 +45,8 @@ public class FeignController {
         return paFeignService.d(task);
     }
 
+    //Time Limiter Name: ServiceE(TimeLimiter must use with CompletableFuture and CompletableFuture must be run in another thread)
+    @TimeLimiter(name = "ServiceE")
     @GetMapping("/feign/e/json")
     public CompletableFuture<Map<String, Object>> e(@RequestParam Integer task) {
         log.info("::e, task={}", task);

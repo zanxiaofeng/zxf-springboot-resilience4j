@@ -13,7 +13,6 @@
 # Openfeign Configuration
 - /org/springframework/cloud/spring-cloud-openfeign-core/3.1.7/spring-cloud-openfeign-core-3.1.7.jar!/META-INF/additional-spring-configuration-metadata.json
 
-
 # Core classes of Resilience4j Bulkhead
 - io.github.resilience4j.bulkhead.annotation.Bulkhead@
 - io.github.resilience4j.bulkhead.autoconfigure.BulkheadAutoConfiguration
@@ -64,7 +63,6 @@
 - io.github.resilience4j.timelimiter.configure.TimeLimiterAspect*
 - io.github.resilience4j.scheduled.threadpool.autoconfigure.ContextAwareScheduledThreadPoolAutoConfiguration
 
-
 # Resilience4j Configuration
 - /io/github/resilience4j/resilience4j-spring-boot2/1.7.0/resilience4j-spring-boot2-1.7.0.jar!/META-INF/spring-configuration-metadata.json
 - /io/github/resilience4j/resilience4j-spring-boot2/1.7.0/resilience4j-spring-boot2-1.7.0.jar!/META-INF/additional-spring-configuration-metadata.json
@@ -99,7 +97,7 @@
 # Format of Name of Circuit Breaker Created by Feign Client(Can override by @CircuitBreaker)
 - {Feign-Class-Name}{Method-Name}{Parameter-Types}
 
-# 默认注解生效或策略执行shunxu
+# 默认注解生效或策略执行顺序
 - Retry->CircuitBreaker->RateLimiter->TimeLimiter->Bulkhead
 - resilience4j.retry.retry-aspect-order
 - resilience4j.circuitbreaker.circuit-breaker-aspect-order
@@ -148,14 +146,14 @@
 - `curl http://localhost:8080/normal/b/json?task=503`
 
 # rate limiter
-- `curl http://localhost:8080/feign/e/json?task=200` (5 times/60s)
-- `curl http://localhost:8080/[feign|normal]/c/json?task=200` (2 times/60s)
+- `curl http://localhost:8080/feign/e/json?task=200` (5times/60s)
+- `curl http://localhost:8080/[feign|normal]/c/json?task=200` (2times/60s)
 
 # bulkhead(Does not work)
 - `curl http://localhost:8080/feign/d/json?task=408`
 - `curl http://localhost:8080/normal/d/json?task=408`
 
-# time limiter(Does not work)
+# time limiter
 - `curl http://localhost:8080/feign/e/json?task=408`
 - `curl http://localhost:8080/normal/e/json?task=408`
 
