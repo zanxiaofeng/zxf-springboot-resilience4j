@@ -18,7 +18,9 @@
 - io.github.resilience4j.bulkhead.autoconfigure.BulkheadAutoConfiguration
 - io.github.resilience4j.bulkhead.autoconfigure.BulkheadMetricsAutoConfiguration
 - io.github.resilience4j.bulkhead.autoconfigure.ThreadPoolBulkheadMetricsAutoConfiguration
-- 
+- io.github.resilience4j.bulkhead.BulkheadFullException
+- io.github.resilience4j.bulkhead.configure.BulkheadAspect*
+
 # Core classes of Resilience4j CircuitBreaker
 - io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker@
 - io.github.resilience4j.circuitbreaker.CircuitBreaker
@@ -149,7 +151,7 @@
 - `curl http://localhost:8080/feign/e/json?task=200` (5times/60s)
 - `curl http://localhost:8080/[feign|normal]/c/json?task=200` (2times/60s)
 
-# bulkhead(Does not work)
+# bulkhead
 - `curl http://localhost:8080/feign/d/json?task=408`
 - `curl http://localhost:8080/normal/d/json?task=408`
 

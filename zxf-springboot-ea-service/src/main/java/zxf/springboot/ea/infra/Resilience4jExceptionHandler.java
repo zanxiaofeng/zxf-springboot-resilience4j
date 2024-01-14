@@ -1,5 +1,6 @@
 package zxf.springboot.ea.infra;
 
+import io.github.resilience4j.bulkhead.BulkheadFullException;
 import io.github.resilience4j.circuitbreaker.CallNotPermittedException;
 import io.github.resilience4j.ratelimiter.RequestNotPermitted;
 import lombok.extern.slf4j.Slf4j;
@@ -20,12 +21,12 @@ public class Resilience4jExceptionHandler {
         return "调用不被允许";
     }
 
-//    @ExceptionHandler({ BulkheadFullException.class })
-//    @ResponseStatus(HttpStatus.BANDWIDTH_LIMIT_EXCEEDED)
-//    public String handleBulkheadFullException(BulkheadFullException ex) {
-//        log.error("Handle BulkheadFullException exception for bulkhead", ex);
-//        return "隔板已满";
-//    }
+    @ExceptionHandler({BulkheadFullException.class})
+    @ResponseStatus(HttpStatus.BANDWIDTH_LIMIT_EXCEEDED)
+    public String handleBulkheadFullException(BulkheadFullException ex) {
+        log.error("Handle BulkheadFullException exception for bulkhead", ex);
+        return "隔板已满";
+    }
 
     @ExceptionHandler({RequestNotPermitted.class})
     @ResponseStatus(HttpStatus.TOO_MANY_REQUESTS)
