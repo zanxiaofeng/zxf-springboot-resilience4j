@@ -62,12 +62,13 @@
 - io.github.resilience4j.timelimiter.autoconfigure.TimeLimiterAutoConfiguration
 - io.github.resilience4j.timelimiter.autoconfigure.TimeLimiterMetricsAutoConfiguration
 - io.github.resilience4j.timelimiter.configure.TimeLimiterAspect*
-
 - io.github.resilience4j.scheduled.threadpool.autoconfigure.ContextAwareScheduledThreadPoolAutoConfiguration
 
 
 # Resilience4j Configuration
 - /io/github/resilience4j/resilience4j-spring-boot2/1.7.0/resilience4j-spring-boot2-1.7.0.jar!/META-INF/spring-configuration-metadata.json
+- /io/github/resilience4j/resilience4j-spring-boot2/1.7.0/resilience4j-spring-boot2-1.7.0.jar!/META-INF/additional-spring-configuration-metadata.json
+- /org/springframework/boot/spring-boot-actuator-autoconfigure/2.6.14/spring-boot-actuator-autoconfigure-2.6.14.jar!/META-INF/spring-configuration-metadata.json
 - /org/springframework/boot/spring-boot-actuator-autoconfigure/2.6.14/spring-boot-actuator-autoconfigure-2.6.14.jar!/META-INF/additional-spring-configuration-metadata.json
 
 # 断路器（Circuit Breaker）
