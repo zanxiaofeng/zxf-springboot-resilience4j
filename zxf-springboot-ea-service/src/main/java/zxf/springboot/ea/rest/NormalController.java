@@ -40,7 +40,7 @@ public class NormalController {
     }
 
     @GetMapping("/normal/d/json")
-    public Map<String, Object> d(@RequestParam Integer task) {
+    public CompletableFuture<Map<String, Object>> d(@RequestParam Integer task) {
         log.info("::d, task={}", task);
         return paNormalService.d(task);
     }

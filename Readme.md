@@ -32,6 +32,7 @@
 - io.github.resilience4j.circuitbreaker.autoconfigure.CircuitBreakerMetricsAutoConfiguration
 - io.github.resilience4j.circuitbreaker.autoconfigure.CircuitBreakersHealthIndicatorAutoConfiguration
 - io.github.resilience4j.circuitbreaker.monitoring.endpoint.CircuitBreakerEndpoint
+- io.github.resilience4j.circuitbreaker.configure.CircuitBreakerAspect*
 
 # Core classes of Resilience4j RateLimiter
 - io.github.resilience4j.ratelimiter.annotation.RateLimiter@
@@ -92,10 +93,17 @@
 - 限时器用来限制在另外一个线程中执行的服务调用的时间。
 
 # Format of Feign Client Name
-- {Feign-Class-Name}#{Method-Name}
+- {Feign-Class-Name}#{Method-Name}({Parameter-Types,})
 
-# Format of Circuit Breaker Name
+# Format of Name of Circuit Breaker Created by Feign Client(Can override by @CircuitBreaker)
 - {Feign-Class-Name}{Method-Name}{Parameter-Types}
+
+# 默认注解生效或策略执行shunxu
+- Retry->CircuitBreaker->RateLimiter->TimeLimiter->Bulkhead
+- resilience4j.retry.retry-aspect-order
+- resilience4j.circuitbreaker.circuit-breaker-aspect-order
+- resilience4j.ratelimiter.rate-limiter-aspect-order
+- resilience4j.timelimiter.time-limiter-aspect-order
 
 # Test
 - http://localhost:8080/actuator/health
@@ -129,27 +137,26 @@
 - http://localhost:8080/actuator/timelimiterevents
 - http://localhost:8080/actuator/timelimiterevents/{name}
 - http://localhost:8080/actuator/timelimiterevents/{name}/{eventType}
-- curl http://localhost:8080/a/json?task=200
-- curl http://localhost:8080/a/json?task=307[retry]
-- curl http://localhost:8080/a/json?task=400
-- curl http://localhost:8080/e/json?task=408[timeout]
-- curl http://localhost:8080/e/json?task=200[timelimiter]
-- curl http://localhost:8080/d/json?task=408[bulkhead]
-
-
 
 # circuitbreaker
-- `curl http://localhost:8080/feign/[a|b|c|d|e]/json?task=[400|500]` - {call api multiple times}
-- `curl http://localhost:8080/normal/a/json?task=[400|500]` - {call api multiple times}
+- `curl http://localhost:8080/feign/[a|b|c|d|e]/json?task=[400|500]`
+- `curl http://localhost:8080/normal/a/json?task=[400|500]`
 
 # retry
-- `curl http://localhost:8080/feign/b/json?task=307`
-- `curl http://localhost:8080/normal/b/json?task=307`
+- `curl http://localhost:8080/feign/b/json?task=503` (Does not work, conflict with feign fallback policy)
+- `curl http://localhost:8080/normal/b/json?task=503`
 
 # rate limiter
-- `curl http://localhost:8080/feign/[c|e]/json?task=200`
-- `curl http://localhost:8080/normal/c/json?task=200`
+- `curl http://localhost:8080/feign/e/json?task=200` (5 times/60s)
+- `curl http://localhost:8080/[feign|normal]/c/json?task=200` (2 times/60s)
 
-# time limiter
+# bulkhead(Does not work)
+- `curl http://localhost:8080/feign/d/json?task=408`
+- `curl http://localhost:8080/normal/d/json?task=408`
+
+# time limiter(Does not work)
 - `curl http://localhost:8080/feign/e/json?task=408`
 - `curl http://localhost:8080/normal/e/json?task=408`
+
+# test anno sequence
+- `curl http://localhost:8080/normal/d/json?task=200`
