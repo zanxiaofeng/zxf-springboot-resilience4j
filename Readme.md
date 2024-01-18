@@ -161,3 +161,7 @@
 
 # test anno sequence
 - `curl http://localhost:8080/normal/d/json?task=200`
+
+# test failover
+- `curl http://localhost:8080/config?task=200` (success return A)
+- `curl http://localhost:8080/config?task=400` (failover return B)
