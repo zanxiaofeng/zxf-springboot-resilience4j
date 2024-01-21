@@ -1,3 +1,17 @@
+# Core classes of RestTemplate
+- org.springframework.web.client.RestTemplate
+- org.springframework.web.client.ResponseErrorHandler[interface]
+- org.springframework.web.client.DefaultResponseErrorHandler
+- org.springframework.web.client.RestClientException
+- org.springframework.web.client.ResourceAccessException
+- org.springframework.web.client.RestClientResponseException
+- org.springframework.web.client.HttpStatusCodeException
+- org.springframework.web.client.UnknownHttpStatusCodeException
+- org.springframework.web.client.HttpClientErrorException
+- org.springframework.web.client.HttpClientErrorException$BadRequest
+- org.springframework.web.client.HttpServerErrorException
+- org.springframework.web.client.HttpServerErrorException$InternalServerError
+
 # Core classes of Openfeign
 - org.springframework.cloud.openfeign.EnableFeignClients;
 - org.springframework.cloud.openfeign.FeignClient;
@@ -7,7 +21,9 @@
 - org.springframework.cloud.openfeign.FeignCircuitBreakerInvocationHandler
 - feign.RetryableException
 - feign.FeignException
+- feign.FeignException$FeignServerException
 - feign.FeignException$InternalServerError
+- feign.FeignException$FeignClientException
 - feign.FeignException$BadRequest
 
 # Openfeign Configuration
