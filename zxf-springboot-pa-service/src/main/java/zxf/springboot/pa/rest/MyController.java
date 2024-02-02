@@ -64,7 +64,7 @@ public class MyController {
         return response;
     }
 
-    private ResponseEntity<Map<String, Object>> result(@RequestParam Integer task, String service) throws InterruptedException {
+    private ResponseEntity<Map<String, Object>> result(Integer task, String service) throws InterruptedException {
         HttpStatus httpStatus = HttpStatus.resolve(task);
         switch (httpStatus) {
             case OK:
