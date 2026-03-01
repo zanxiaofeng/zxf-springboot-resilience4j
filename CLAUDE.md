@@ -87,6 +87,10 @@ All Resilience4j configuration is in `zxf-springboot-ea-service/src/main/resourc
 **Feign Client Names** (for configuration):
 - Format: `{Feign-Class-Name}#{Method-Name}({Parameter-Types,})`
 
+**Normal (RestTemplate) Service Names** (manually specified in annotations on `PANormalService`):
+- Format: `Normal-Service{X}` (e.g., `Normal-ServiceA`, `Normal-ServiceD`)
+- `Normal-ServiceD` demonstrates all five patterns stacked on one method
+
 ## Actuator Endpoints
 
 Spring Boot Actuator is exposed at `http://localhost:8080/actuator` with monitoring:
@@ -99,6 +103,20 @@ Spring Boot Actuator is exposed at `http://localhost:8080/actuator` with monitor
 - `/actuator/bulkheads` - Bulkhead status
 - `/actuator/ratelimiters` - Rate limiter status
 
+## Key Implementation Patterns
+
+### Feign Fallback
+`PAClient` uses `fallbackFactory = PAClientFallbackFactory.class`. `PAClientFallbackFactory` implements `FallbackFactory<PAClient>` and creates a `PAClientFallback` instance, giving access to the cause exception for logging.
+
+### Inline Fallback Method
+`PAConfigService.config()` uses `@CircuitBreaker(name = "Config-Service", fallbackMethod = "configFallback")`. The `configFallback` method must have the same parameters plus an `Exception` parameter, and is called when the circuit opens—it redirects to the `/pa/b/json` endpoint.
+
+### TimeLimiter Constraint
+`@TimeLimiter` requires the service method to return `CompletableFuture<T>` and the actual HTTP call must run in a separate thread (via `@Async` on `PANormalClient.callDownstreamAsync`). Without a separate thread, the time limiter cannot interrupt the call.
+
+### task=503 Retry Behavior
+PA service uses an `AtomicInteger retryCounter` — odd-numbered requests to `task=503` succeed, even-numbered fail. This means retry testing requires multiple calls to observe the alternating behavior.
+
 ## Exception Handling
 
 `Resilience4jExceptionHandler` maps Resilience4j exceptions to HTTP statuses:
@@ -109,10 +127,10 @@ Spring Boot Actuator is exposed at `http://localhost:8080/actuator` with monitor
 
 ## Technology Stack
 
-- Java 17
-- Spring Boot 2.7.18
-- Spring Cloud 2021.0.8
+- Java 21
+- Spring Boot 3.5.11
+- Spring Cloud 2025.0.1
 - Spring Cloud OpenFeign
-- Resilience4j (via `spring-cloud-starter-circuitbreaker-resilience4j`)
+- Resilience4j 2.2.0 (via `spring-cloud-circuitbreaker-resilience4j`)
 - Lombok
 - Spring Boot Actuator
